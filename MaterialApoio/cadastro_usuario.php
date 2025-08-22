@@ -4,16 +4,16 @@ require_once 'conexao.php';
 
 // Verifica se o usuário tem permissão para acessar a página
 // Supondo que o perfil 1 seja o administrador
-if ($_SESSION['perfil'] != 1) {
+if($_SESSION['perfil'] != 1) {
     //echo "<script>alert('Acesso negado. Você não tem permissão para acessar esta página.');</script>";
     echo "Acesso Negado";
     exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if($_SERVER["REQUEST_METHOD"]=="POST") {
     $nome = $_POST['nome'];
     $email = $_POST['email'];
-    $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+    $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT); 
     $id_perfil = $_POST['id_perfil'];
 
     $sql = "INSERT INTO usuario (nome, email, senha, id_perfil) VALUES (:nome, :email, :senha, :id_perfil)";
@@ -23,42 +23,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bindParam(':senha', $senha);
     $stmt->bindParam(':id_perfil', $id_perfil);
 
-    if ($stmt->execute()) {
+    if($stmt->execute()) {
         echo "<script>alert('Usuário cadastrado com sucesso!');</script>";
     } else {
         echo "<script>alert('Erro ao cadastrar usuário. Tente novamente.');</script>";
     }
 }
 
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title></title>
+    <title>Document</title>
 </head>
-
 <body>
-    <h1>Cadastro de Usuario</h1>
+    <h2>Cadastrar Usuário</h2>
     <form action="cadastro_usuario.php" method="POST">
         <label for="nome">Nome:</label>
-        <input type="text" name="nome" id="nome" required><br>
+        <input type="text" id="nome" name="nome" required><br><br>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required><br>
+        <input type="email" id="email" name="email" required><br><br>
 
         <label for="senha">Senha:</label>
-        <input type="password" name="senha" id="senha" required><br>
+        <input type="password" id="senha" name="senha" required><br><br>
 
         <label for="id_perfil">Perfil:</label>
-        <select name="id_perfil" id="id_perfil" required>
+        <select id="id_perfil" name="id_perfil">
             <option value="1">Administrador</option>
-            <option value="2">Secretária</option>
+            <option value="2">Secretaria</option>
             <option value="3">Almoxarife</option>
             <option value="4">Cliente</option>
         </select>
@@ -67,7 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="reset">Cancelar</button>
     </form>
 
-    <p><a href="principal.php">Voltar</a></p>
-</body>
+    <p><a href="principal.php"></a></p>
 
+            
+</body>
 </html>

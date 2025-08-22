@@ -11,7 +11,7 @@ if (($_SESSION['perfil'] != 1 && $_SESSION['perfil'] != 2)) {
 $usuario = [];
 
 //SE O FORMULARIO FOR ENVIADO, BUSCA O USUARIO PELO ID OU NOME
-if($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['busca'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['busca'])) {
     $busca = trim($_POST['busca']);
 
     // Verifica se a busca é numérica (ID) ou alfanumérica (nome)
@@ -19,7 +19,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['busca'])) {
         $sql = "SELECT * FROM usuario WHERE id_usuario = :busca ORDER BY nome asc";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':busca', $busca, PDO::PARAM_INT);
-    } else{
+    } else {
         $sql = "SELECT * FROM usuario WHERE nome LIKE :busca_nome ORDER BY nome asc";
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':busca_nome', "%busca%", PDO::PARAM_STR);
@@ -35,12 +35,14 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2">
     <title>Buscar Usuário</title>
 </head>
+
 <body>
     <h2>Lista de Usuários</h2>
     <form action="buscar_usuario.php" method="post">
@@ -50,7 +52,8 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </form>
 
     <?php if (!empty($usuarios)): ?>
-        <table border="1">
+        <center>
+            <table border>
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
@@ -58,7 +61,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Perfil</th>
                     <th>Ações</th>
                 </tr>
-         
+
                 <?php foreach ($usuarios as $usuario): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($usuario['id_usuario']); ?></td>
@@ -66,16 +69,19 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?php echo htmlspecialchars($usuario['email']); ?></td>
                         <td><?php echo htmlspecialchars($usuario['id_perfil']); ?></td>
                         <td>
-                            <a href="alterar_usuario.php?id=<?=htmlspecialchars( $usuario['id_usuario']); ?>">Alterar</a> |
-                            <a href="excluir_usuario.php?id=<?=htmlspecialchars( $usuario['id_usuario']); ?>"onclick="return confirm('Tem certeza que deseja excluir esse usuário?')">Excluir</a>
+                            <a href="alterar_usuario.php?id=<?= htmlspecialchars($usuario['id_usuario']); ?>">Alterar</a> |
+                            <a href="excluir_usuario.php?id=<?= htmlspecialchars($usuario['id_usuario']); ?>"
+                                onclick="return confirm('Tem certeza que deseja excluir esse usuário?')">Excluir</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
-        </table>
+            </table>
+        </center>
     <?php else: ?>
         <p>Nenhum usuário encontrado.</p>
     <?php endif; ?>
 
     <a href="principal.php">Voltar</a>
 </body>
+
 </html>

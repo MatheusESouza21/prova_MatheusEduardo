@@ -52,3 +52,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <button type="submit">Enviar senha temporaria</button>
 </body>
 </html>
+</html>

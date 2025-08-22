@@ -168,3 +168,68 @@ button {
 button:hover {
     background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
 }
+
+/* Estilo para tabelas */
+/* Estilo para tabelas */
+table {
+    width: 60%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 1px solid #000000;
+    background-color: #7fc5ff;
+    border-radius: 8px;
+    overflow: hidden; /* Garante que o conteúdo respeite as bordas arredondadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra */
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+
+/* Estilo para o botão de voltar */
+a[href="principal.php"] {
+    display: inline-block;
+    margin-top: 20px;
+    
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+a[href="principal.php"]:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para os botões "Alterar" e "Excluir" */
+table a {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    font-size: 14px;
+    text-decoration: none;
+    border-radius: 5px;
+    color: rgb(34, 34, 34);
+    transition: background-color 0.3s ease;
+}
+
+table a.alterar {
+    background-color: #ffffff; /* Verde para o botão Alterar */
+}
+
+table a.alterar:hover {
+    background-color: #218838; /* Verde mais escuro ao passar o mouse */
+}
+
+table a.excluir {
+    background-color: #dc3545; /* Vermelho para o botão Excluir */
+}
+
+table a.excluir:hover {
+    background-color: #c82333; /* Vermelho mais escuro ao passar o mouse */
+}
