@@ -8,7 +8,7 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
-if($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_usuario = $_SESSION['id_usuario'];
     $nova_senha = $_POST['nova_senha'];
     $confirmar_senha = $_POST['confirmar_senha'];
@@ -36,19 +36,78 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+// Obtendo o nome do perfil do usuario logado
+$id_perfil = $_SESSION['perfil'];
+$sqlPerfil = "SELECT nome_perfil FROM perfil WHERE id_perfil = :id_perfil";
+$stmtPerfil = $pdo->prepare($sqlPerfil);
+$stmtPerfil->bindParam(':id_perfil', $id_perfil);
+$stmtPerfil->execute();
+$perfil = $stmtPerfil->fetch(PDO::FETCH_ASSOC);
+$nome_perfil = $perfil['nome_perfil'];
+
+// Definição das permissões por perfil
+$permissoes = [
+    1 => [
+        "Cadastrar" => ["cadastro_usuario.php", "cadastro_perfil.php", "cadastro_cliente.php", "cadastro_fornecedor.php", "cadastro_produto.php", "cadastro_funcionario.php"],
+        "Buscar" => ["buscar_usuario.php", "buscar_perfil.php", "buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php", "buscar_funcionario.php"],
+        "Alterar" => ["alterar_usuario.php", "alterar_perfil.php", "alterar_cliente.php", "alterar_fornecedor.php", "alterar_produto.php", "alterar_funcionario.php"],
+        "Excluir" => ["excluir_usuario.php", "excluir_perfil.php", "excluir_cliente.php", "excluir_fornecedor.php", "excluir_produto.php", "excluir_funcionario.php"]
+    ],
+
+    2 => [
+        "Cadastrar" => ["cadastro_cliente.php"],
+        "Buscar" => ["buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php"],
+        "Alterar" => ["alterar_cliente.php", "alterar_fornecedor.php"]
+    ],
+
+    3 => [
+        "Cadastrar" => ["cadastro_fornecedor.php", "cadastro_produto.php"],
+        "Buscar" => ["buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php"],
+        "Alterar" => ["alterar_fornecedor.php", "alterar_produto.php"],
+        "Excluir" => ["excluir_produto.php"]
+    ],
+
+    4 => [
+        "Cadastrar" => ["cadastro_cliente.php"],
+        "Buscar" => ["buscar_produto.php"],
+        "Alterar" => ["alterar_cliente.php"]
+    ],
+];
+
+// Obtendo as opções disponíveis para o perfil do usuário logado
+$opcoes_menu = $permissoes[$id_perfil];
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alterar Senha</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
+    <nav>
+        <ul class="menu">
+            <?php foreach ($opcoes_menu as $categoria => $arquivos): ?>
+                <li class="dropdown">
+                    <a href="#"><?= $categoria ?></a>
+                    <ul class="dropdown-menu">
+                        <?php foreach ($arquivos as $arquivo): ?>
+                            <li>
+                                <a href="<?= $arquivo ?>"><?= ucfirst(str_replace("_", " ", basename($arquivo, ".php"))) ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </nav>
     <h2>Alterar Senha</h2>
-    <p>Olá, <strong><?php echo $_SESSION['usuario'];?></strong>. Digite sua nova senha abaixo:</p>
+    <p>Olá, <strong><?php echo $_SESSION['usuario']; ?></strong>. Digite sua nova senha abaixo:</p>
 
     <form action="alterar_senha.php" method="post">
         <label for="nova_senha">Nova Senha:</label>
@@ -71,7 +130,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             var tipo = senha1.type === "password" ? "text" : "password";
             senha1.type = tipo;
             senha2.type = tipo;
-            }
+        }
     </script>
 </body>
+
 </html>
