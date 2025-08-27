@@ -2,37 +2,35 @@
 session_start();
 require_once 'conexao.php';
 
-if (($_SESSION['perfil'] = 4)) {
-    echo "<script>alert('Acesso Negado');window.location.href = 'principal.php';</script>";
+// VERFICIA SE O USUARIO DE PERMISSÃO DE ADM
+if ($_SESSION['perfil'] != 1) {
+    echo "<script>alert('Acesso Negado!');window.location.href='principal.php';</script>";
     exit();
 }
 
-//INICIALIZA VARIAVEL PARA EVITAR ERROS
-$cliente = [];
+// INICIALIZA As VARIAVEIS
+$cliente = null;
 
-//SE O FORMULARIO FOR ENVIADO, BUSCA O USUARIO PELO ID OU NOME
-if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['busca'])) {
-    $busca = trim($_POST['busca']);
-
-    // Verifica se a busca é numérica (ID) ou alfanumérica (nome)
-    if (is_numeric($busca)) {
-        $sql = "SELECT * FROM cliente WHERE id_cliente = :busca ORDER BY nome_cliente asc";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':busca', $busca, PDO::PARAM_INT);
-    } else {
-        $sql = "SELECT * FROM cliente WHERE nome_cliente LIKE :busca_nome ORDER BY nome_cliente asc";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':busca_nome', "%busca%", PDO::PARAM_STR);
-    }
-} else {
-    // Se não houver busca, busca todos os usuários
-    $sql = "SELECT * FROM cliente ORDER BY nome_cliente asc";
-    $stmt = $pdo->prepare($sql);
-}
-
+//BUSCAR TODOS OS USUARIOS EM ORDEM ALFABÉTICA
+$sql = "SELECT * FROM cliente ORDER BY nome_cliente ASC";
+$stmt = $pdo->prepare($sql);
 $stmt->execute();
-$usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// SE UM id FOR PASSADO VIA GET, EXCLUI O USUARIO
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $id_cliente = $_GET['id'];
+
+    $sql = "DELETE FROM cliente WHERE id_cliente = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $id_cliente, PDO::PARAM_INT);
+    if ($stmt->execute()) {
+        echo "<script>alert('Usuário excluído com sucesso!');window.location.href='excluir_cliente.php';</script>";
+    } else {
+        echo "<script>alert('Erro ao excluir o usuário!');</script>";
+    }
+}
+// Obtendo o nome do perfil do usuario logado
 $id_perfil = $_SESSION['perfil'];
 $sqlPerfil = "SELECT nome_perfil FROM perfil WHERE id_perfil = :id_perfil";
 $stmtPerfil = $pdo->prepare($sqlPerfil);
@@ -75,13 +73,13 @@ $opcoes_menu = $permissoes[$id_perfil];
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excluir Cliente</title>
     <link rel="stylesheet" href="styles.css?v=2">
-    <title>Buscar Usuário</title>
 </head>
 
 <body>
@@ -101,34 +99,29 @@ $opcoes_menu = $permissoes[$id_perfil];
             <?php endforeach; ?>
         </ul>
     </nav>
-    <h2>Lista de Usuários</h2>
-    <form action="buscar_usuario.php" method="post">
-        <label for="busca">Digite o ID ou NOME(opcional):</label>
-        <input type="text" id="busca" name="busca" required>
-        <button type="submit">Buscar</button>
-    </form>
+    <h2>Excluir Cliente</h2>
 
-    <?php if (!empty($usuarios)): ?>
+    <?php if (!empty($clientes)): ?>
         <center>
             <table border>
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Email</th>
-                    <th>Perfil</th>
+                    <th>Endereço</th>
+                    <th>Telefone</th>
                     <th>Ações</th>
                 </tr>
-
-                <?php foreach ($usuarios as $usuario): ?>
+                <?php foreach ($clientes as $cliente): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($usuario['id_usuario']); ?></td>
-                        <td><?php echo htmlspecialchars($usuario['nome']); ?></td>
-                        <td><?php echo htmlspecialchars($usuario['email']); ?></td>
-                        <td><?php echo htmlspecialchars($usuario['id_perfil']); ?></td>
+                        <td><?= htmlspecialchars($cliente['id_cliente']) ?></td>
+                        <td><?= htmlspecialchars($cliente['nome_cliente']) ?></td>
+                        <td><?= htmlspecialchars($cliente['email']) ?></td>
+                        <td><?= htmlspecialchars($cliente['endereco']) ?></td>
+                        <td><?= htmlspecialchars($cliente['telefone']) ?></td>
                         <td>
-                            <a href="alterar_usuario.php?id=<?= htmlspecialchars($usuario['id_usuario']); ?>">Alterar</a> |
-                            <a href="excluir_usuario.php?id=<?= htmlspecialchars($usuario['id_usuario']); ?>"
-                                onclick="return confirm('Tem certeza que deseja excluir esse usuário?')">Excluir</a>
+                            <a href="excluir_cliente.php?id=<?= htmlspecialchars($cliente['id_cliente']); ?>"
+                                onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -137,8 +130,7 @@ $opcoes_menu = $permissoes[$id_perfil];
     <?php else: ?>
         <p>Nenhum usuário encontrado.</p>
     <?php endif; ?>
-
-    <a href="principal.php">Voltar</a>
+    <p><a href="principal.php">Voltar</a></p>
 </body>
 
 </html>

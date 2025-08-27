@@ -2,14 +2,6 @@
 session_start();
 require_once 'conexao.php';
 
-// Verifica se o usuário tem permissão para acessar a página
-// Supondo que o perfil 1 seja o administrador
-if ($_SESSION['perfil'] = 2) {
-    //echo "<script>alert('Acesso negado. Você não tem permissão para acessar esta página.');</script>";
-    echo "Acesso Negado";
-    exit();
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome_cliente = $_POST['nome_cliente'];
     $email = $_POST['email'];
@@ -29,7 +21,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<script>alert('Erro ao cadastrar cliente. Tente novamente.');</script>";
     }
 }
+// Obtendo o nome do perfil do usuario logado
+$id_perfil = $_SESSION['perfil'];
+$sqlPerfil = "SELECT nome_perfil FROM perfil WHERE id_perfil = :id_perfil";
+$stmtPerfil = $pdo->prepare($sqlPerfil);
+$stmtPerfil->bindParam(':id_perfil', $id_perfil);
+$stmtPerfil->execute();
+$perfil = $stmtPerfil->fetch(PDO::FETCH_ASSOC);
+$nome_perfil = $perfil['nome_perfil'];
 
+// Definição das permissões por perfil
+$permissoes = [
+    1 => [
+        "Cadastrar" => ["cadastro_usuario.php", "cadastro_perfil.php", "cadastro_cliente.php", "cadastro_fornecedor.php", "cadastro_produto.php", "cadastro_funcionario.php"],
+        "Buscar" => ["buscar_usuario.php", "buscar_perfil.php", "buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php", "buscar_funcionario.php"],
+        "Alterar" => ["alterar_usuario.php", "alterar_perfil.php", "alterar_cliente.php", "alterar_fornecedor.php", "alterar_produto.php", "alterar_funcionario.php"],
+        "Excluir" => ["excluir_usuario.php", "excluir_perfil.php", "excluir_cliente.php", "excluir_fornecedor.php", "excluir_produto.php", "excluir_funcionario.php"]
+    ],
+
+    2 => [
+        "Cadastrar" => ["cadastro_cliente.php"],
+        "Buscar" => ["buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php"],
+        "Alterar" => ["alterar_cliente.php", "alterar_fornecedor.php"]
+    ],
+
+    3 => [
+        "Cadastrar" => ["cadastro_fornecedor.php", "cadastro_produto.php"],
+        "Buscar" => ["buscar_cliente.php", "buscar_fornecedor.php", "buscar_produto.php"],
+        "Alterar" => ["alterar_fornecedor.php", "alterar_produto.php"],
+        "Excluir" => ["excluir_produto.php"]
+    ],
+
+    4 => [
+        "Cadastrar" => ["cadastro_cliente.php"],
+        "Buscar" => ["buscar_produto.php"],
+        "Alterar" => ["alterar_cliente.php"]
+    ],
+];
+
+// Obtendo as opções disponíveis para o perfil do usuário logado
+$opcoes_menu = $permissoes[$id_perfil];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required><br><br>
 
-        <label for="endereco">Senha:</label>
+        <label for="endereco">Endereço:</label>
         <input type="text" id="endereco" name="endereco" required><br><br>
 
         <label for="telefone">Telefone:</label>

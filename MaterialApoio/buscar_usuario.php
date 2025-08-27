@@ -14,19 +14,19 @@ $usuario = [];
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['busca'])) {
     $busca = trim($_POST['busca']);
 
-    // Verifica se a busca é numérica (ID) ou alfanumérica (nome)
     if (is_numeric($busca)) {
-        $sql = "SELECT * FROM usuario WHERE id_usuario = :busca ORDER BY nome asc";
+        $sql = "SELECT * FROM usuario WHERE id_usuario = :busca ORDER BY nome ASC";
         $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':busca', $busca, PDO::PARAM_INT);
+        $stmt->bindParam(":busca", $busca, PDO::PARAM_INT);
     } else {
-        $sql = "SELECT * FROM usuario WHERE nome LIKE :busca_nome ORDER BY nome asc";
+        $sql = "SELECT * FROM usuario WHERE nome LIKE :busca_nome ORDER BY nome ASC";
         $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':busca_nome', "%busca%", PDO::PARAM_STR);
+        $stmt->bindValue(":busca_nome", "$busca%", PDO::PARAM_STR);
+        $busca = "$busca%"; 
     }
 } else {
-    // Se não houver busca, busca todos os usuários
-    $sql = "SELECT * FROM usuario ORDER BY nome asc";
+    // Busca todos os usuarios se o formulario não for enviado
+    $sql = "SELECT * FROM usuario ORDER BY nome ASC";
     $stmt = $pdo->prepare($sql);
 }
 $stmt->execute();
