@@ -95,7 +95,7 @@ $opcoes_menu = $permissoes[$id_perfil];
         <input type="text" id="nome_cliente" name="nome_cliente" required><br><br>
 
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br><br>
+        <input type="email" id="email" name="email" required ><br><br>
 
         <label for="endereco">Endereço:</label>
         <input type="text" id="endereco" name="endereco" required><br><br>

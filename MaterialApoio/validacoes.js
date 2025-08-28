@@ -22,3 +22,4 @@ function validarFuncionario() {
 
     return true;
 }
+
